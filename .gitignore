@@ -1,0 +1,49 @@
+# Build artifacts
+build/
+bin/
+lib/
+*.exe
+*.a
+*.o
+*.obj
+*.lib
+*.dll
+*.so
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+build.ninja
+.ninja_deps
+.ninja_log
+compile_commands.json
+CTestTestfile.cmake
+
+# Test outputs
+test_stdout.txt
+test_stderr.txt
+
+# Internal planning docs
+MEMORY.md
+PLAN.md
+PRD.md
+RULES.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies (downloaded by CMake)
+_deps/
+
+# MNIST data (download separately)
+data/mnist/*.ubyte
+data/mnist/*.gz
