@@ -9,6 +9,7 @@ lib/
 *.lib
 *.dll
 *.so
+*.dylib
 
 # CMake
 CMakeCache.txt
@@ -29,6 +30,7 @@ MEMORY.md
 PLAN.md
 PRD.md
 RULES.md
+TARGETS.md
 
 # IDE
 .vscode/
