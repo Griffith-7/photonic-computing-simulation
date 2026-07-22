@@ -3,7 +3,7 @@ requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "onn-sim"
+name = "photonic-onn"
 version = "0.1.0"
 description = "Optical Neural Network Simulator with physical chip modeling"
 readme = "README.md"
@@ -25,6 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Physics",
 ]
@@ -36,10 +37,25 @@ Repository = "https://github.com/Griffith-7/photonic-computing-simulation"
 [tool.scikit-build]
 cmake.minimum-version = "3.20"
 cmake.build-type = "Release"
-
-[tool.pytest.ini_options]
-pythonpath = ["python"]
+wheel.packages = ["python/onn"]
 
 [tool.scikit-build.cmake.define]
 ONN_BUILD_PYTHON = "ON"
 CMAKE_CXX_STANDARD = "20"
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+
+[tool.cibuildwheel]
+skip = ["cp38-*", "pp*"]
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}"
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]

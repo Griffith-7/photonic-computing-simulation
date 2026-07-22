@@ -1,0 +1,73 @@
+name: Build & Publish to PyPI
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21
+        env:
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_ARCHS_LINUX: "x86_64"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_WINDOWS: "AMD64"
+          CIBW_TEST_COMMAND: "python -m pytest {project}/tests/test_python.py -v"
+          CIBW_TEST_REQUIRES: "numpy pytest"
+          CIBW_ENVIRONMENT_LINUX: >
+            CMAKE_ARGS="-DONN_BUILD_PYTHON=ON -DCMAKE_CXX_STANDARD=20"
+          CIBW_ENVIRONMENT_MACOS: >
+            CMAKE_ARGS="-DONN_BUILD_PYTHON=ON -DCMAKE_CXX_STANDARD=20"
+          CIBW_ENVIRONMENT_WINDOWS: >
+            CMAKE_ARGS="-DONN_BUILD_PYTHON=ON -DCMAKE_CXX_STANDARD=20"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to PyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/photonic-onn
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*"
+          merge-multiple: true
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
