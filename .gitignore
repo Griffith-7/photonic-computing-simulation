@@ -1,5 +1,6 @@
 # Build artifacts
 build/
+build_python/
 bin/
 lib/
 *.exe
@@ -10,6 +11,7 @@ lib/
 *.dll
 *.so
 *.dylib
+*.pyd
 
 # CMake
 CMakeCache.txt
@@ -24,6 +26,7 @@ CTestTestfile.cmake
 # Test outputs
 test_stdout.txt
 test_stderr.txt
+results.json
 
 # Internal planning docs
 MEMORY.md
@@ -42,6 +45,11 @@ TARGETS.md
 # OS
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
 
 # Dependencies (downloaded by CMake)
 _deps/

@@ -52,3 +52,22 @@ add_executable(onn_tests
 )
 target_link_libraries(onn_tests PRIVATE onn_core GTest::gtest_main)
 add_test(NAME onn_tests COMMAND onn_tests)
+
+option(ONN_BUILD_PYTHON "Build Python bindings" OFF)
+if(ONN_BUILD_PYTHON)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+    find_package(pybind11 CONFIG QUIET)
+    if(NOT pybind11_FOUND)
+        include(FetchContent)
+        FetchContent_Declare(pybind11
+            GIT_REPOSITORY https://github.com/pybind/pybind11.git
+            GIT_TAG        v2.13.6
+            GIT_SHALLOW    TRUE
+        )
+        FetchContent_MakeAvailable(pybind11)
+    endif()
+
+    pybind11_add_module(onn_python src/python/bindings.cpp)
+    target_link_libraries(onn_python PRIVATE onn_core)
+    target_include_directories(onn_python PRIVATE src)
+endif()

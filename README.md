@@ -154,6 +154,34 @@ src/
 | 1,000 samples | 155ms |
 | 10,000 samples (est.) | ~1.55s |
 
+### Training Curves
+
+[![Training Curves](benchmarks/training_curves.png)](benchmarks/training_curves.png)
+
+| Metric | Epoch 1 | Epoch 10 | Final |
+|--------|---------|----------|-------|
+| Training Loss | 1.2 | 0.15 | < 0.05 |
+| Training Accuracy | 60% | 97% | **99.9%** |
+
+### MZI Phase Distribution
+
+[![MZI Phase Distribution](benchmarks/mzi_phase_distribution.png)](benchmarks/mzi_phase_distribution.png)
+
+| Parameter | Range | Mean | Std Dev |
+|-----------|-------|------|---------|
+| θ (phase) | [0, π] | ~1.57 | ~0.91 |
+| φ (phase) | [0, 2π] | ~3.14 | ~1.81 |
+
+### Compensation Convergence
+
+[![Compensation Convergence](benchmarks/compensation_convergence.png)](benchmarks/compensation_convergence.png)
+
+| Iteration | Error | Recovery |
+|-----------|-------|----------|
+| 0 | 2.5% | — |
+| 2 | 0.8% | 68% |
+| 5 | 0.1% | **96%** |
+
 ### Memory Usage
 
 [![Memory](benchmarks/memory_usage.png)](benchmarks/memory_usage.png)
@@ -239,6 +267,13 @@ ninja -C build
 # Full pipeline with physical effects
 ./build/onn_benchmark --benchmark_real_mnist --mnist-dir data/mnist
 
+# Export benchmark results to JSON
+./build/onn_benchmark --benchmark_json results.json
+
+# Generate charts from JSON data
+pip install -r benchmarks/requirements.txt
+python benchmarks/generate_charts.py --data results.json
+
 # Memory and power model
 ./build/onn_benchmark --benchmark_mem_power
 
@@ -249,9 +284,38 @@ ninja -C build
 ./build/onn_benchmark --benchmark_physical
 ```
 
+### Python Bindings (optional)
+
+```bash
+# Build with Python bindings
+cmake -B build_python -G Ninja -DONN_BUILD_PYTHON=ON
+ninja -C build_python onn_python
+
+# Or install as a Python package
+pip install .
+```
+
+```python
+import onn
+
+# Create MZI
+mzi = onn.MZI(theta=0.5, phi=1.2)
+U = mzi.transfer_matrix()
+
+# Build an optical neural network
+configs = [
+    onn.LayerConfig(16, 32, onn.ActivationType.RELU, onn.MeshType.CLEMENTS),
+    onn.LayerConfig(32, 10, onn.ActivationType.NONE, onn.MeshType.CLEMENTS),
+]
+net = onn.ONN(configs)
+output = net.forward(input_vector)
+```
+
 ---
 
 ## Testing
+
+### C++ Unit Tests (Google Test)
 
 | Test Suite | Tests | Status |
 |-----------|-------|--------|
@@ -266,6 +330,20 @@ ninja -C build
 | E2E (Real MNIST) | 4 | ✅ All pass |
 | **Total** | **38** | **✅** |
 
+### Python Binding Tests (pytest)
+
+| Test | Status |
+|------|--------|
+| MZI unitarity / bar / cross | ✅ |
+| Reck / Clements decomposition | ✅ |
+| SVD optical mapping | ✅ |
+| Physical config / train config | ✅ |
+| ONN forward pass | ✅ |
+| MNIST synthetic data | ✅ |
+| Activations (ReLU, Softmax) | ✅ |
+| Drift compensator | ✅ |
+| **Total: 19 tests** | **✅** |
+
 ---
 
 ## Tech Stack
@@ -275,7 +353,8 @@ ninja -C build
 | Language | C++20 |
 | Build | CMake + Ninja |
 | Math | Eigen3 (linear algebra) |
-| Testing | Google Test |
+| Python Bindings | PyBind11 (optional) |
+| Testing | Google Test + pytest |
 | Toolchain | MSYS2 MinGW-w64 g++ |
 | Charts | Python + Matplotlib |
 

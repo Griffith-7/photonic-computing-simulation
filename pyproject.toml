@@ -1,0 +1,45 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "onn-sim"
+version = "0.1.0"
+description = "Optical Neural Network Simulator with physical chip modeling"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Griffith" },
+]
+dependencies = [
+    "numpy>=1.24",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage = "https://github.com/Griffith-7/photonic-computing-simulation"
+Repository = "https://github.com/Griffith-7/photonic-computing-simulation"
+
+[tool.scikit-build]
+cmake.minimum-version = "3.20"
+cmake.build-type = "Release"
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+
+[tool.scikit-build.cmake.define]
+ONN_BUILD_PYTHON = "ON"
+CMAKE_CXX_STANDARD = "20"

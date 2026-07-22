@@ -25,11 +25,19 @@ jobs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-eigen3
 
-    - name: Configure
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: pip install pybind11 numpy pytest
+
+    - name: Configure (C++ only)
       shell: msys2 {0}
       run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
-    - name: Build
+    - name: Build (C++)
       shell: msys2 {0}
       run: ninja -C build
 
@@ -40,3 +48,6 @@ jobs:
     - name: Run Benchmark (Quick)
       shell: msys2 {0}
       run: ./build/onn_benchmark --benchmark_mzi --benchmark_mesh --benchmark_forward --benchmark_mem_power
+
+    - name: Generate Charts
+      run: python benchmarks/generate_charts.py
