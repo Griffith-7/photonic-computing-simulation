@@ -31,7 +31,7 @@ jobs:
         python-version: '3.11'
 
     - name: Install Python dependencies
-      run: pip install pybind11 numpy pytest
+      run: pip install pybind11 numpy pytest matplotlib
 
     - name: Configure (C++ only)
       shell: msys2 {0}
